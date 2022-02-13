@@ -369,7 +369,7 @@ def build_dependencies(key, keys, shelldeps, varflagsexcl, d):
     #bb.note("Variable %s references %s and calls %s" % (key, str(deps), str(execs)))
     #d.setVarFlag(key, "vardeps", deps)
 
-def generate_dependencies(d, whitelist):
+def generate_dependencies(d, ignore):
 
     keys = set(key for key in d if not key.startswith("__"))
     shelldeps = set(key for key in d.getVar("__exportlist", False) if d.getVarFlag(key, "export", False) and not d.getVarFlag(key, "unexport", False))
@@ -384,7 +384,7 @@ def generate_dependencies(d, whitelist):
         newdeps = deps[task]
         seen = set()
         while newdeps:
-            nextdeps = newdeps - whitelist
+            nextdeps = newdeps - ignore
             seen |= nextdeps
             newdeps = set()
             for dep in nextdeps:
@@ -395,7 +395,7 @@ def generate_dependencies(d, whitelist):
         #print "For %s: %s" % (task, str(deps[task]))
     return tasklist, deps, values
 
-def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
+def generate_dependency_hash(tasklist, gendeps, lookupcache, ignore, fn):
     taskdeps = {}
     basehash = {}
 
@@ -408,7 +408,7 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
         else:
             data = [data]
 
-        gendeps[task] -= whitelist
+        gendeps[task] -= ignore
         newdeps = gendeps[task]
         seen = set()
         while newdeps:
@@ -416,9 +416,9 @@ def generate_dependency_hash(tasklist, gendeps, lookupcache, whitelist, fn):
             seen |= nextdeps
             newdeps = set()
             for dep in nextdeps:
-                if dep in whitelist:
+                if dep in ignore:
                     continue
-                gendeps[dep] -= whitelist
+                gendeps[dep] -= ignore
                 newdeps |= gendeps[dep]
             newdeps -= seen
 
