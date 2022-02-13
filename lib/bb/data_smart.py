@@ -1012,10 +1012,10 @@ class DataSmart(MutableMapping):
         d = self.createCopy()
         bb.data.expandKeys(d)
 
-        config_whitelist = set((d.getVar("BB_HASHCONFIG_WHITELIST") or "").split())
+        config_ignore_vars = set((d.getVar("BB_HASHCONFIG_IGNORE_VARS") or "").split())
         keys = set(key for key in iter(d) if not key.startswith("__"))
         for key in keys:
-            if key in config_whitelist:
+            if key in config_ignore_vars:
                 continue
 
             value = d.getVar(key, False) or ""
