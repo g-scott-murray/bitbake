@@ -341,6 +341,12 @@ def finalize(fn, d, variant = None):
             handlerln = int(d.getVarFlag(var, "lineno", False))
             bb.event.register(var, d.getVar(var, False), (d.getVarFlag(var, "eventmask") or "").split(), handlerfn, handlerln, data=d)
 
+        renamed_flags = d.getVarFlags('BB_RENAMED_VARIABLES')
+        if renamed_flags:
+            for v in renamed_flags:
+                if d.getVar(v) != None:
+                    bb.warn('Variable %s has been renamed to %s' % (v, d.getVarFlag('BB_RENAMED_VARIABLES', v)))
+
         bb.event.fire(bb.event.RecipePreFinalise(fn), d)
 
         bb.data.expandKeys(d)
